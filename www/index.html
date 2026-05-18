@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#16213e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>装修项目管家</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="css/app.css?v=13">
+</head>
+<body>
+
+<div class="app-container" id="app">
+  <!-- ===== 顶栏 ===== -->
+  <header class="header">
+    <button class="hamburger" onclick="toggleDrawer()">☰</button>
+    <div class="header-title" id="headerTitle">装修项目管家</div>
+    <span id="headerDate" style="font-size:12px;color:var(--text-dim);margin-right:8px;white-space:nowrap;"></span>
+    <span class="header-status status-healthy" id="headerStatus">正常</span>
+  </header>
+
+  <!-- ===== 主内容 ===== -->
+  <div class="main-content" id="mainContent">
+
+    <!-- ======== 面板：项目列表 ======== -->
+    <div class="panel active" id="panel-projects">
+      <div class="flex-between mb-12">
+        <div class="section-title">我的项目</div>
+        <button class="btn btn-primary btn-sm" onclick="showNewProjectForm()">+ 新建项目</button>
+      </div>
+      <div id="projectList"></div>
+    </div>
+
+    <!-- ======== 面板：仪表盘 ======== -->
+    <div class="panel" id="panel-dashboard">
+      <div class="metrics-grid" id="dashboardMetrics">
+        <div class="metric-card"><div class="metric-value text-green" id="dashProgress">0%</div><div class="metric-label">总进度</div></div>
+        <div class="metric-card"><div class="metric-value" id="dashDayCount">1/70</div><div class="metric-label">施工天数</div></div>
+        <div class="metric-card"><div class="metric-value text-yellow" id="dashRemain">69</div><div class="metric-label">剩余天数</div></div>
+        <div class="metric-card"><div class="metric-value" id="dashDelayed">0</div><div class="metric-label">滞后任务</div></div>
+      </div>
+
+      <!-- 时间进度条 -->
+      <div class="card" style="padding:12px 16px;">
+        <div class="flex-between mb-4" style="font-size:13px;">
+          <span>⏱ 项目进度</span>
+          <span id="dashTimeProgressLabel">0%</span>
+        </div>
+        <div class="progress-bar" style="height:14px;border-radius:7px;">
+          <div class="progress-fill green" id="dashTimeProgressFill" style="width:0%;border-radius:7px;background:linear-gradient(90deg,var(--green),var(--blue));"></div>
+        </div>
+        <div class="flex-between mt-4" style="font-size:11px;color:var(--text-dim);">
+          <span id="dashStartDate">开始:</span>
+          <span id="dashEndDate">结束:</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="flex-between mb-8">
+          <div class="card-title">进度对比</div>
+          <span style="font-size:12px;color:var(--text-dim)">计划 vs 实际</span>
+        </div>
+        <div class="chart-placeholder" id="progressChart">
+          <canvas id="progressCanvas" width="400" height="140" style="width:100%;height:140px;border-radius:8px;"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title mb-8">施工阶段</div>
+        <div id="dashPhases"></div>
+      </div>
+
+      <div class="card">
+        <div class="flex-between mb-8">
+          <div class="card-title">甘特图</div>
+          <span style="font-size:12px;color:var(--text-dim)">阶段 · 时间轴</span>
+        </div>
+        <div class="gantt-container" id="ganttContainer"></div>
+      </div>
+
+      <div class="card" style="cursor:pointer;" onclick="switchPanel('daily')">
+        <div class="card-title mb-8">📋 跟进概览</div>
+        <div id="dashDailyOverview"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title mb-8">待处理返工</div>
+        <div id="dashRework"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title mb-8">今日纪要</div>
+        <div id="dashToday" style="font-size:13px;color:var(--text-dim);"></div>
+      </div>
+    </div>
+
+    <!-- ======== 面板：每日跟进 ======== -->
+    <div class="panel" id="panel-daily">
+      <div class="sticky-back">
+        <button class="btn btn-sm btn-secondary" onclick="goBack()">← 返回</button>
+        <div style="font-size:14px;font-weight:600;">每日跟进</div>
+        <div></div>
+      </div>
+      <div class="day-selector">
+        <button class="day-nav" onclick="changeDay(-1)">◀</button>
+        <div>
+          <div class="day-date" id="dailyDate">2026-05-15</div>
+          <div class="day-week" id="dailyWeek">第1天</div>
+        </div>
+        <button class="day-nav" onclick="changeDay(1)">▶</button>
+        <button class="btn btn-sm btn-secondary" onclick="jumpToToday()">今天</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title mb-8">现场信息</div>
+        <div class="form-row mb-8">
+          <div class="form-group" style="margin-bottom:0;"><label class="form-label">出工人数</label><input class="form-input" type="number" id="dailyWorkers" min="0" onchange="saveDailyField()"></div>
+          <div class="form-group" style="margin-bottom:0;"><label class="form-label">天气</label><select class="form-select" id="dailyWeather" onchange="saveDailyField()"><option>晴</option><option>阴</option><option>雨</option><option>雪</option><option>大风</option></select></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title mb-8">今日计划</div>
+        <div id="dailyPlannedTasks"></div>
+        <button class="btn btn-sm btn-secondary mt-8" onclick="addDailyPlannedTask()">+ 添加计划任务</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title mb-8">今日完成</div>
+        <div id="dailyActualTasks"></div>
+        <button class="btn btn-sm btn-secondary mt-8" onclick="addDailyActualTask()">+ 添加完成任务</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title mb-8">现场记录</div>
+        <textarea class="form-textarea" id="dailyNotes" placeholder="记录今天的施工情况、遇到的问题…" onchange="saveDailyField()"></textarea>
+      </div>
+
+      <div class="card">
+        <div class="card-title mb-8">现场照片</div>
+        <div class="photo-grid" id="dailyPhotos"></div>
+        <button class="btn btn-sm btn-secondary" onclick="takePhoto('daily')">📸 拍照上传</button>
+      </div>
+
+      <button class="btn btn-primary btn-block mt-8" onclick="saveDailyLog()">💾 保存今日记录</button>
+    </div>
+
+    <!-- ======== 面板：影像日志 ======== -->
+    <div class="panel" id="panel-photos">
+      <div class="tabs" id="photoTabs">
+        <button class="tab active" data-cat="all" onclick="switchPhotoTab('all')">全部</button>
+        <button class="tab" data-cat="daily" onclick="switchPhotoTab('daily')">施工</button>
+        <button class="tab" data-cat="rework" onclick="switchPhotoTab('rework')">返工</button>
+        <button class="tab" data-cat="meeting" onclick="switchPhotoTab('meeting')">会议</button>
+      </div>
+      <div class="photo-grid" id="photoGrid"></div>
+      <button class="btn btn-sm btn-secondary mt-8" onclick="showPhotoCategoryMenu()">📸 拍照</button>
+    </div>
+
+    <!-- ======== 面板：返工管理 ======== -->
+    <div class="panel" id="panel-rework">
+      <div class="sticky-back">
+        <button class="btn btn-sm btn-secondary" onclick="goBack()">← 返回</button>
+        <div style="font-size:14px;font-weight:600;">返工管理</div>
+        <div></div>
+      </div>
+      <div class="tabs" id="reworkTabs">
+        <button class="tab active" onclick="switchReworkTab('in-progress')">整改中</button>
+        <button class="tab" onclick="switchReworkTab('resolved')">整改完</button>
+      </div>
+      <div id="reworkList"></div>
+      <button class="btn btn-primary btn-block mt-8" onclick="showReworkForm()">+ 新建返工记录</button>
+    </div>
+
+    <!-- ======== 面板：计划甘特 ======== -->
+    <div class="panel" id="panel-planning">
+      <div class="sticky-back">
+        <button class="btn btn-sm btn-secondary" onclick="goBack()">← 返回</button>
+        <div style="font-size:14px;font-weight:600;">计划管理</div>
+        <div></div>
+      </div>
+      <div class="card">
+        <div class="card-title mb-8">项目设置</div>
+        <div class="form-group"><label class="form-label">项目名称</label><input class="form-input" id="planName" onchange="savePlanSettings()"></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">开工日期</label><input class="form-input" type="date" id="planStartDate" onchange="savePlanSettings();updateProjectEndDate()"></div>
+          <div class="form-group"><label class="form-label">总工期（天）</label><input class="form-input" type="number" id="planTotalDays" onchange="savePlanSettings();updateProjectEndDate()"></div>
+        </div>
+        <div id="projectEndDateDisplay" style="font-size:13px;color:var(--primary);text-align:center;padding:8px;background:var(--bg-card2);border-radius:8px;margin-top:8px;"></div>
+      </div>
+
+      <div class="card">
+        <div class="flex-between mb-8">
+          <div class="card-title">施工阶段</div>
+          <button class="btn btn-sm btn-secondary" onclick="showPhaseForm()">+ 添加阶段</button>
+        </div>
+        <div id="phaseList"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title mb-8">里程碑</div>
+        <div id="milestoneList"></div>
+        <button class="btn btn-sm btn-secondary mt-8" onclick="showMilestoneForm()">+ 添加里程碑</button>
+      </div>
+    </div>
+
+    <!-- ======== 面板：录音记录 ======== -->
+    <div class="panel" id="panel-recording">
+      <div class="card">
+        <div class="card-title mb-8">会议录音</div>
+        <div class="recorder-bar">
+          <button class="record-btn" id="recordBtn" onclick="toggleRecording()">●</button>
+          <div class="recorder-status">
+            <div id="recorderStatus">点击开始录音</div>
+            <div class="recorder-time" id="recorderTime">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title mb-8">录音记录</div>
+        <div id="recordingList"></div>
+      </div>
+    </div>
+
+    <!-- ======== 面板：报告 ======== -->
+    <div class="panel" id="panel-report">
+      <div class="btn-group mb-12">
+        <button class="btn btn-primary btn-sm" onclick="genDailyReport()">📋 生成日报</button>
+        <button class="btn btn-secondary btn-sm" onclick="genWeeklyReport()">📊 生成周报</button>
+        <button class="btn btn-secondary btn-sm" onclick="genPhaseReport()">📑 阶段报告</button>
+      </div>
+      <div class="card">
+        <div class="card-title mb-8">报告预览</div>
+        <div class="report-box" id="reportContent">点击上方按钮生成报告</div>
+        <div class="btn-group mt-8">
+          <button class="btn btn-sm btn-secondary" onclick="copyReport()">📋 复制</button>
+          <button class="btn btn-sm btn-secondary" onclick="exportReportTxt()">💾 导出TXT</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== 面板：竣工 ======== -->
+    <div class="panel" id="panel-completion">
+      <div class="sticky-back">
+        <button class="btn btn-sm btn-secondary" onclick="goBack()">← 返回</button>
+        <div id="completionTitle" style="font-size:14px;font-weight:600;">竣工</div>
+        <div></div>
+      </div>
+      <div id="completionContent"></div>
+    </div>
+
+    <!-- ======== 面板：设置 ======== -->
+    <div class="panel" id="panel-settings">
+      <div class="card">
+        <div class="card-title mb-8">🌐 局域网同步</div>
+        <p style="font-size:13px;color:var(--text-dim);margin-bottom:8px;">在 Windows 电脑上运行 <code>node server.js</code> 后，手机和电脑可通过局域网互传数据。</p>
+        <div class="form-group">
+          <label class="form-label">服务器地址</label>
+          <div class="form-row">
+            <input class="form-input" id="syncServerIP" placeholder="如 192.168.1.100:3456" style="flex:1;">
+            <button class="btn btn-secondary btn-sm" onclick="discoverServer()">🔍 搜索</button>
+          </div>
+        </div>
+        <div id="syncStatus" style="font-size:13px;color:var(--text-dim);margin-bottom:8px;"></div>
+        <div class="btn-group">
+          <button class="btn btn-primary btn-sm" onclick="syncPull()">📥 从电脑拉取</button>
+          <button class="btn btn-secondary btn-sm" onclick="syncPush()">📤 推送到电脑</button>
+          <button class="btn btn-success btn-sm" onclick="syncFull()">🔄 双向同步</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title mb-8">数据管理</div>
+        <button class="btn btn-secondary btn-block mb-8" onclick="exportData()">📤 导出数据 (JSON)</button>
+        <button class="btn btn-secondary btn-block" onclick="document.getElementById('importFileInput').click()">📥 导入数据 (JSON)</button>
+        <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importData(event)">
+      </div>
+      <div class="card">
+        <div class="card-title mb-8">关于</div>
+        <p style="font-size:13px;color:var(--text-dim);line-height:1.6;">
+          装修项目管家 v1.0<br>
+          专为装饰公司项目经理设计<br>
+          数据全部存储在本地，支持导出备份
+        </p>
+      </div>
+      <div class="card">
+        <div class="card-title mb-8">照片存储</div>
+        <div style="font-size:13px;color:var(--text-dim);">
+          <div>施工照片: <span id="photoCount_daily">0</span> 张</div>
+          <div>返工照片: <span id="photoCount_rework">0</span> 张</div>
+          <div>会议照片: <span id="photoCount_meeting">0</span> 张</div>
+          <div>总录音: <span id="recordingCount">0</span> 条</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 底部导航（仅项目内显示） ===== -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="nav-item" data-panel="projects" onclick="switchPanel('projects')">
+      <span class="nav-icon">🏠</span><span style="font-size:10px;">列表</span>
+    </button>
+    <button class="nav-item active" data-panel="dashboard" onclick="switchPanel('dashboard')">
+      <span class="nav-icon">📊</span><span style="font-size:10px;">仪表</span>
+    </button>
+    <button class="nav-item" data-panel="daily" onclick="switchPanel('daily')">
+      <span class="nav-icon">📋</span><span style="font-size:10px;">跟进</span>
+    </button>
+    <button class="nav-item" data-panel="photos" onclick="switchPanel('photos')">
+      <span class="nav-icon">📸</span><span style="font-size:10px;">影像</span>
+    </button>
+    <button class="nav-item" data-panel="rework" onclick="switchPanel('rework')">
+      <span class="nav-icon">🔧</span><span style="font-size:10px;">返工</span>
+    </button>
+    <button class="nav-item" data-panel="completion" onclick="switchPanel('completion')">
+      <span class="nav-icon">✅</span><span style="font-size:10px;">竣工</span>
+    </button>
+  </nav>
+</div>
+
+<!-- ===== 侧边抽屉 ===== -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">📂 导航菜单</div>
+  <button class="drawer-item" onclick="switchPanel('planning');toggleDrawer()">
+    <span class="di-icon">📐</span> 计划 & 甘特图
+  </button>
+  <button class="drawer-item" onclick="switchPanel('recording');toggleDrawer()">
+    <span class="di-icon">🎙️</span> 录音记录
+  </button>
+  <button class="drawer-item" onclick="switchPanel('report');toggleDrawer()">
+    <span class="di-icon">📋</span> 报告生成
+  </button>
+  <button class="drawer-item" onclick="showCompletionOverview();toggleDrawer()">
+    <span class="di-icon">✅</span> 竣工总览
+  </button>
+  <button class="drawer-item" onclick="switchPanel('settings');toggleDrawer()">
+    <span class="di-icon">⚙️</span> 设置
+  </button>
+  <div class="drawer-divider"></div>
+  <button class="drawer-item" onclick="genDailyReport();toggleDrawer()">
+    <span class="di-icon">📝</span> 快速生成日报
+  </button>
+  <button class="drawer-item" onclick="toggleDrawer()">
+    <span class="di-icon">✕</span> 关闭
+  </button>
+</div>
+
+<!-- ===== Toast ===== -->
+<div class="toast" id="toast"></div>
+
+<!-- ===== 弹窗：阶段表单 ===== -->
+<div class="modal-overlay" id="phaseModal">
+  <div class="modal">
+    <div class="modal-title">施工阶段</div>
+    <div class="form-group"><label class="form-label">阶段名称</label><input class="form-input" id="phaseFormName"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">起始日期</label><input class="form-input" type="date" id="phaseFormStart"></div>
+      <div class="form-group"><label class="form-label">天数</label><input class="form-input" type="number" id="phaseFormDays" min="1" placeholder="持续天数" oninput="updatePhaseDatePreview()"></div>
+    </div>
+    <div id="phaseDatePreview" style="font-size:12px;color:var(--primary);text-align:center;padding:8px;background:var(--bg-card2);border-radius:8px;margin-bottom:8px;"></div>
+    <div class="form-group"><label class="form-label">颜色</label><input class="form-input" type="color" id="phaseFormColor" value="#e94560"></div>
+    <input type="hidden" id="phaseFormId" value="">
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('phaseModal')">取消</button>
+      <button class="btn btn-danger" id="phaseDeleteBtn" style="display:none" onclick="deletePhaseForm()">删除</button>
+      <button class="btn btn-primary" onclick="savePhaseForm()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 弹窗：返工表单 ===== -->
+<div class="modal-overlay" id="reworkModal">
+  <div class="modal">
+    <div class="modal-title">返工/问题记录</div>
+    <div class="form-group"><label class="form-label">问题描述</label><textarea class="form-textarea" id="reworkFormDesc" placeholder="详细描述发现的问题…"></textarea></div>
+    <div class="form-group"><label class="form-label">位置/区域</label><input class="form-input" id="reworkFormLocation" placeholder="如：客厅东墙"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">严重程度</label><select class="form-select" id="reworkFormSeverity"><option value="low">一般</option><option value="medium">中等</option><option value="high" selected>严重</option></select></div>
+      <div class="form-group"><label class="form-label">限改日期</label><input class="form-input" type="date" id="reworkFormDeadline"></div>
+    </div>
+    <div class="form-group"><label class="form-label">负责人</label><input class="form-input" id="reworkFormAssignee" placeholder="谁负责整改"></div>
+    <input type="hidden" id="reworkFormId" value="">
+    <div class="form-group"><label class="form-label">问题照片</label><button class="btn btn-sm btn-secondary" onclick="takePhoto('rework')">📸 拍照</button><div class="photo-grid mt-8" id="reworkFormPhotos"></div></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('reworkModal')">取消</button>
+      <button class="btn btn-primary" onclick="saveReworkForm()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 弹窗：新建项目 ===== -->
+<div class="modal-overlay" id="newProjectModal">
+  <div class="modal">
+    <div class="modal-title">新建项目</div>
+    <div class="form-group"><label class="form-label">项目名称</label><input class="form-input" id="newProjName" placeholder="如：万科天空之城3栋502"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">开工日期</label><input class="form-input" type="date" id="newProjStart"></div>
+      <div class="form-group"><label class="form-label">总工期（天）</label><input class="form-input" type="number" id="newProjDays" value="70" min="1"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('newProjectModal')">取消</button>
+      <button class="btn btn-primary" onclick="confirmNewProject()">创建</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 弹窗：返工详情 ===== -->
+<div class="modal-overlay" id="reworkDetailModal">
+  <div class="modal">
+    <div class="modal-title" id="reworkDetailTitle">返工详情</div>
+    <div id="reworkDetailContent"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('reworkDetailModal')">关闭</button>
+      <button class="btn btn-danger" id="reworkDetailDeleteBtn" onclick="deleteReworkItem()">删除</button>
+      <button class="btn btn-success" id="reworkDetailResolveBtn" onclick="resolveReworkItem()">标记完成</button>
+      <button class="btn btn-warning" id="reworkDetailUnresolveBtn" style="display:none;background:var(--yellow);color:#fff;" onclick="unresolveReworkItem()">撤回整改</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 弹窗：里程碑表单 ===== -->
+<div class="modal-overlay" id="milestoneModal">
+  <div class="modal">
+    <div class="modal-title">里程碑</div>
+    <div class="form-group"><label class="form-label">名称</label><input class="form-input" id="milestoneFormName"></div>
+    <div class="form-group"><label class="form-label">第几天</label><input class="form-input" type="number" id="milestoneFormDay" min="1"></div>
+    <input type="hidden" id="milestoneFormId" value="">
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('milestoneModal')">取消</button>
+      <button class="btn btn-primary" onclick="saveMilestoneForm()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 弹窗：照片分类选择 ===== -->
+<div class="modal-overlay" id="photoCategoryModal">
+  <div class="modal">
+    <div class="modal-title">拍照分类</div>
+    <p style="font-size:14px;color:var(--text-dim);margin-bottom:16px;">选择照片所属分类：</p>
+    <button class="btn btn-primary btn-block mb-8" onclick="takePhoto('daily');closeModal('photoCategoryModal')">📸 施工进度</button>
+    <button class="btn btn-secondary btn-block mb-8" onclick="takePhoto('rework');closeModal('photoCategoryModal')">🔧 返工问题</button>
+    <button class="btn btn-secondary btn-block mb-8" onclick="takePhoto('meeting');closeModal('photoCategoryModal')">📞 会议记录</button>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('photoCategoryModal')">取消</button></div>
+  </div>
+</div>
+
+<!-- ===== 图片预览 ===== -->
+<div class="image-preview-overlay" id="imagePreview" onclick="closeImagePreview()">
+  <img id="imagePreviewImg" src="" alt="preview">
+</div>
+
+<!-- ===== 隐藏的文件输入（用于拍照/选图） ===== -->
+<input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhotoCapture(event)">
+
+<script src="js/data.js?v=13"></script>
+<script src="js/app.js?v=13"></script>
+</body>
+</html>

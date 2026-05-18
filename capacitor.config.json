@@ -1,0 +1,9 @@
+{
+  "appId": "com.pm.app",
+  "appName": "装修项目管家",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  }
+}
