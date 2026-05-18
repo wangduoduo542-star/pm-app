@@ -140,7 +140,7 @@
       <div class="card">
         <div class="card-title mb-8">现场照片</div>
         <div class="photo-grid" id="dailyPhotos"></div>
-        <button class="btn btn-sm btn-secondary" onclick="takePhoto('daily')">📸 拍照上传</button>
+        <button class="btn btn-sm btn-secondary" onclick="takePhoto('daily')"><img src="icons/相机.png" class="icon-inline"> 拍照上传</button>
       </div>
 
       <button class="btn btn-primary btn-block mt-8" onclick="saveDailyLog()">💾 保存今日记录</button>
@@ -155,7 +155,7 @@
         <button class="tab" data-cat="meeting" onclick="switchPhotoTab('meeting')">会议</button>
       </div>
       <div class="photo-grid" id="photoGrid"></div>
-      <button class="btn btn-sm btn-secondary mt-8" onclick="showPhotoCategoryMenu()">📸 拍照</button>
+      <button class="btn btn-sm btn-secondary mt-8" onclick="showPhotoCategoryMenu()"><img src="icons/相机.png" class="icon-inline"> 拍照</button>
     </div>
 
     <!-- ======== 面板：返工管理 ======== -->
@@ -382,7 +382,7 @@
     </div>
     <div class="form-group"><label class="form-label">负责人</label><input class="form-input" id="reworkFormAssignee" placeholder="谁负责整改"></div>
     <input type="hidden" id="reworkFormId" value="">
-    <div class="form-group"><label class="form-label">问题照片</label><button class="btn btn-sm btn-secondary" onclick="takePhoto('rework')">📸 拍照</button><div class="photo-grid mt-8" id="reworkFormPhotos"></div></div>
+    <div class="form-group"><label class="form-label">问题照片</label><button class="btn btn-sm btn-secondary" onclick="takePhoto('rework')"><img src="icons/相机.png" class="icon-inline"> 拍照</button><div class="photo-grid mt-8" id="reworkFormPhotos"></div></div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('reworkModal')">取消</button>
       <button class="btn btn-primary" onclick="saveReworkForm()">保存</button>
@@ -439,7 +439,7 @@
   <div class="modal">
     <div class="modal-title">拍照分类</div>
     <p style="font-size:14px;color:var(--text-dim);margin-bottom:16px;">选择照片所属分类：</p>
-    <button class="btn btn-primary btn-block mb-8" onclick="takePhoto('daily');closeModal('photoCategoryModal')">📸 施工进度</button>
+    <button class="btn btn-primary btn-block mb-8" onclick="takePhoto('daily');closeModal('photoCategoryModal')"><img src="icons/相机.png" class="icon-inline"> 施工进度</button>
     <button class="btn btn-secondary btn-block mb-8" onclick="takePhoto('rework');closeModal('photoCategoryModal')">🔧 返工问题</button>
     <button class="btn btn-secondary btn-block mb-8" onclick="takePhoto('meeting');closeModal('photoCategoryModal')">📞 会议记录</button>
     <div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('photoCategoryModal')">取消</button></div>

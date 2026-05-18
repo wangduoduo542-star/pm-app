@@ -70,7 +70,7 @@ async function refreshProjectList() {
   const container = document.getElementById('projectList');
 
   if (!projects || projects.length === 0) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📂</div><p>暂无项目，点击上方新建</p></div>';
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon"><img src="icons/列表.png" style="width:48px;height:48px;"></div><p>暂无项目，点击上方新建</p></div>';
     return;
   }
 
@@ -94,7 +94,7 @@ async function refreshProjectList() {
         <div class="progress-fill ${isCompleted ? 'green' : (progress >= 100 ? 'green' : 'yellow')}" style="width:${isCompleted ? 100 : progress}%;"></div>
       </div>
       <div class="flex-between">
-        <span style="font-size:12px;color:var(--text-dim);">${status} ${isCompleted ? '已竣工 (100%)' : '进度 ' + progress + '%'}</span>
+        <span style="font-size:12px;color:var(--text-dim);"><img src="icons/进度.png" class="icon-inline"> ${isCompleted ? '已竣工 (100%)' : '进度 ' + progress + '%'}</span>
         <div>
           <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation();switchProject('${p.id}')">进入</button>
           <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteProjectConfirm('${p.id}','${p.name}')" style="margin-left:4px;">×</button>
@@ -480,8 +480,8 @@ function renderDailyOverview(project, allLogs, todayLog) {
     ${scrollHtml}
     ${summaryHtml}
     <div style="font-size:11px;color:var(--text-dim);margin-top:6px;padding-top:6px;border-top:1px solid var(--border);display:flex;justify-content:space-between;">
-      <span>📝 计划${totalPlanned}项 · 完成${totalDone}项</span>
-      <span>📊 跟进率${trackedRate}% (${daysWithData}/${elapsed}天)</span>
+      <span><img src="icons/跟进.png" class="icon-inline"> 计划${totalPlanned}项 · 完成${totalDone}项</span>
+      <span><img src="icons/图表-柱状图.png" class="icon-inline"> 跟进率${trackedRate}% (${daysWithData}/${elapsed}天)</span>
     </div>
   `;
 
@@ -725,7 +725,7 @@ async function refreshPhotos() {
   const grid = document.getElementById('photoGrid');
 
   if (filtered.length === 0) {
-    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">📸</div><p>暂无照片</p></div>';
+    grid.innerHTML = '<div class="empty-state"><div class="empty-icon"><img src="icons/相机.png" style="width:48px;height:48px;"></div><p>暂无照片</p></div>';
     return;
   }
 
@@ -1184,7 +1184,7 @@ async function showReworkDetail(id) {
       ${r.resolvedDate ? '✅ 完成日期: ' + r.resolvedDate + '<br>' : ''}
       ${r.resolvedNote ? '📝 整改说明: ' + r.resolvedNote + '<br>' : ''}
     </div>
-    ${photosHtml ? '<div class="mt-12"><div style="font-size:13px;color:var(--text-dim);margin-bottom:6px;">📸 照片:</div><div style="display:flex;gap:6px;flex-wrap:wrap;">' + photosHtml + '</div></div>' : ''}
+    ${photosHtml ? '<div class="mt-12"><div style="font-size:13px;color:var(--text-dim);margin-bottom:6px;"><img src="icons/相机.png" class="icon-inline"> 照片:</div><div style="display:flex;gap:6px;flex-wrap:wrap;">' + photosHtml + '</div></div>' : ''}
     ${r.resolvedPhotos && r.resolvedPhotos.length > 0 ? '<div class="mt-12"><div style="font-size:13px;color:var(--text-dim);margin-bottom:6px;">✅ 完成照片:</div><div style="display:flex;gap:6px;flex-wrap:wrap;">' + r.resolvedPhotos.map(p => `<div class="photo-item" style="aspect-ratio:auto;height:80px;" onclick="previewImage('${p}')"><img src="${p}" style="width:100%;height:100%;object-fit:cover;border-radius:6px;"></div>`).join('') + '</div></div>' : ''}
     ${r.status !== 'resolved' ? '<div class="mt-12"><button class="btn btn-sm btn-secondary" onclick="editReworkForm(' + r.id + ');closeModal(\'reworkDetailModal\')">✏️ 编辑</button></div>' : ''}
   `;
@@ -1892,7 +1892,7 @@ async function refreshCompletion() {
     // 操作按钮
     html += `<div class="card">
       <div class="btn-group">
-        <button class="btn btn-sm btn-secondary" onclick="uploadCompletionFile('image')">📸 上传照片</button>
+        <button class="btn btn-sm btn-secondary" onclick="uploadCompletionFile('image')"><img src="icons/相机.png" class="icon-inline"> 上传照片</button>
         <button class="btn btn-sm btn-secondary" onclick="uploadCompletionFile('document')">📄 上传文档</button>
       </div>
       <div class="mt-12">

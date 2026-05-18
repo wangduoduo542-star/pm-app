@@ -150,8 +150,11 @@ body {
 }
 .drawer-item:active { background: var(--bg-card2); }
 .drawer-item .di-icon { font-size: 20px; width: 28px; text-align: center; }
-.drawer-item .di-icon-img { width: 22px; height: 22px; vertical-align: middle; margin-right: 4px; }
-.nav-icon-img { width: 22px; height: 22px; vertical-align: middle; }
+.di-icon-img, .nav-icon-img { width: 22px; height: 22px; vertical-align: middle; }
+.di-icon-img { margin-right: 4px; }
+.nav-icon-img { filter: brightness(0); }
+.icon-inline { width: 16px; height: 16px; vertical-align: middle; margin: 0 2px; filter: brightness(0); }
+.drawer-item .di-icon-img { filter: brightness(0); }
 .drawer-divider { height: 1px; background: var(--border); margin: 12px 0; }
 
 /* ===== 面板通用 ===== */
