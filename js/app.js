@@ -70,7 +70,7 @@ async function refreshProjectList() {
   const container = document.getElementById('projectList');
 
   if (!projects || projects.length === 0) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-icon"><img src="icons/列表.png" style="width:48px;height:48px;"></div><p>暂无项目，点击上方新建</p></div>';
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon"><img src="icons/新建.png" style="width:48px;height:48px;"></div><p>暂无项目，点击上方新建</p></div>';
     return;
   }
 
