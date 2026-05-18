@@ -11,6 +11,8 @@ let recordingMediaRecorder = null;
 let recordingChunks = [];
 let recordingTimer = null;
 let recordingSeconds = 0;
+let _playingAudio = null;
+let _playingId = null;
 let cameraCallback = null; // 拍照回调
 
 // ====== 初始化 ======
@@ -797,7 +799,7 @@ async function refreshRecordings() {
         <div style="font-size:12px;color:var(--text-dim);">${r.date} · ${r.duration || '0:00'}${r.summary ? ' · 已总结' : ''}</div>
       </div>
       <div class="btn-group">
-        ${r.data ? `<button class="btn btn-sm btn-secondary" onclick="playRecording('${r.id}')">▶</button>` : ''}
+        ${r.data ? `<button class="btn btn-sm btn-secondary" onclick="playRecording(${r.id})">${_playingId === r.id ? '⏹' : '▶'}</button>` : ''}
         <button class="btn btn-sm btn-secondary" onclick="summarizeRecording(${r.id})">AI总结</button>
         <button class="btn btn-sm btn-danger" onclick="deleteRecordingById(${r.id})">×</button>
       </div>
@@ -865,7 +867,9 @@ function stopRecording() {
   document.getElementById('recordBtn').classList.remove('recording');
   document.getElementById('recordBtn').textContent = '●';
   document.getElementById('recorderStatus').textContent = '录音已结束';
+  document.getElementById('recorderTime').textContent = '00:00';
   clearInterval(recordingTimer);
+  recordingSeconds = 0;
 }
 
 function formatTime(seconds) {
@@ -875,11 +879,31 @@ function formatTime(seconds) {
 }
 
 function playRecording(id) {
+  // 如果正在播放同一个录音，停止
+  if (_playingAudio && _playingId === id) {
+    _playingAudio.pause();
+    _playingAudio = null;
+    _playingId = null;
+    refreshRecordings();
+    return;
+  }
+  // 如果正在播放另一个录音，先停止
+  if (_playingAudio) {
+    _playingAudio.pause();
+    _playingAudio = null;
+    _playingId = null;
+  }
+
   getAllRecordings().then(recs => {
-    const rec = recs.find(r => r.id == id);
-    if (!rec || !rec.data) return;
+    const rec = recs.find(r => String(r.id) === String(id));
+    if (!rec || !rec.data) { showToast('❌ 录音数据不存在'); return; }
     const audio = new Audio(rec.data);
-    audio.play();
+    _playingAudio = audio;
+    _playingId = id;
+    refreshRecordings();
+    audio.onended = () => { _playingAudio = null; _playingId = null; refreshRecordings(); };
+    audio.onerror = () => { _playingAudio = null; _playingId = null; refreshRecordings(); showToast('❌ 不支持的音频格式'); };
+    audio.play().catch(() => { _playingAudio = null; _playingId = null; refreshRecordings(); showToast('❌ 播放失败'); });
   });
 }
 
