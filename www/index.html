@@ -80,7 +80,7 @@
       </div>
 
       <div class="card" style="cursor:pointer;" onclick="switchPanel('daily')">
-        <div class="card-title mb-8">📋 跟进概览</div>
+        <div class="card-title mb-8"><img src="icons/跟进.svg" class="icon-inline"> 跟进概览</div>
         <div id="dashDailyOverview"></div>
       </div>
 
@@ -140,10 +140,10 @@
       <div class="card">
         <div class="card-title mb-8">现场照片</div>
         <div class="photo-grid" id="dailyPhotos"></div>
-        <button class="btn btn-sm btn-secondary" onclick="takePhoto('daily')"><img src="icons/相机.png" class="icon-inline"> 拍照上传</button>
+        <button class="btn btn-sm btn-secondary" onclick="takePhoto('daily')"><img src="icons/相机.svg" class="icon-inline"> 拍照上传</button>
       </div>
 
-      <button class="btn btn-primary btn-block mt-8" onclick="saveDailyLog()">💾 保存今日记录</button>
+      <button class="btn btn-primary btn-block mt-8" onclick="saveDailyLog()"><img src="icons/保存.svg" class="icon-inline"> 保存今日记录</button>
     </div>
 
     <!-- ======== 面板：影像日志 ======== -->
@@ -155,7 +155,7 @@
         <button class="tab" data-cat="meeting" onclick="switchPhotoTab('meeting')">会议</button>
       </div>
       <div class="photo-grid" id="photoGrid"></div>
-      <button class="btn btn-sm btn-secondary mt-8" onclick="showPhotoCategoryMenu()"><img src="icons/相机.png" class="icon-inline"> 拍照</button>
+      <button class="btn btn-sm btn-secondary mt-8" onclick="showPhotoCategoryMenu()"><img src="icons/相机.svg" class="icon-inline"> 拍照</button>
     </div>
 
     <!-- ======== 面板：返工管理 ======== -->
@@ -236,7 +236,7 @@
         <div class="report-box" id="reportContent">点击上方按钮生成报告</div>
         <div class="btn-group mt-8">
           <button class="btn btn-sm btn-secondary" onclick="copyReport()">📋 复制</button>
-          <button class="btn btn-sm btn-secondary" onclick="exportReportTxt()">💾 导出TXT</button>
+          <button class="btn btn-sm btn-secondary" onclick="exportReportTxt()"><img src="icons/保存.svg" class="icon-inline"> 导出TXT</button>
         </div>
       </div>
     </div>
@@ -299,22 +299,22 @@
   <!-- ===== 底部导航（仅项目内显示） ===== -->
   <nav class="bottom-nav" id="bottomNav">
     <button class="nav-item" data-panel="projects" onclick="switchPanel('projects')">
-      <img src="icons/列表.png" class="nav-icon-img"><span style="font-size:10px;display:block;">列表</span>
+      <img src="icons/列表.svg" class="nav-icon-img"><span style="font-size:10px;display:block;">列表</span>
     </button>
     <button class="nav-item active" data-panel="dashboard" onclick="switchPanel('dashboard')">
-      <img src="icons/仪表盘_o.png" class="nav-icon-img"><span style="font-size:10px;display:block;">仪表</span>
+      <img src="icons/仪表盘.svg" class="nav-icon-img"><span style="font-size:10px;display:block;">仪表</span>
     </button>
     <button class="nav-item" data-panel="daily" onclick="switchPanel('daily')">
-      <img src="icons/跟进.png" class="nav-icon-img"><span style="font-size:10px;display:block;">跟进</span>
+      <img src="icons/跟进.svg" class="nav-icon-img"><span style="font-size:10px;display:block;">跟进</span>
     </button>
     <button class="nav-item" data-panel="photos" onclick="switchPanel('photos')">
-      <img src="icons/相机.png" class="nav-icon-img"><span style="font-size:10px;display:block;">影像</span>
+      <img src="icons/相机.svg" class="nav-icon-img"><span style="font-size:10px;display:block;">影像</span>
     </button>
     <button class="nav-item" data-panel="rework" onclick="switchPanel('rework')">
-      <img src="icons/返工.png" class="nav-icon-img"><span style="font-size:10px;display:block;">返工</span>
+      <img src="icons/返工.svg" class="nav-icon-img"><span style="font-size:10px;display:block;">返工</span>
     </button>
     <button class="nav-item" data-panel="completion" onclick="switchPanel('completion')">
-      <img src="icons/竣工.png" class="nav-icon-img"><span style="font-size:10px;display:block;">竣工</span>
+      <img src="icons/竣工.svg" class="nav-icon-img"><span style="font-size:10px;display:block;">竣工</span>
     </button>
   </nav>
 </div>
@@ -322,28 +322,28 @@
 <!-- ===== 侧边抽屉 ===== -->
 <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
 <div class="drawer" id="drawer">
-  <div class="drawer-header"><img src="icons/菜单.png" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;filter:brightness(0);"> 菜单</div>
+  <div class="drawer-header"><img src="icons/菜单.svg" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;"> 菜单</div>
   <button class="drawer-item" onclick="switchPanel('planning')">
-    <img src="icons/计划.png" class="di-icon-img"> 施工计划
+    <img src="icons/计划.svg" class="di-icon-img"> 施工计划
   </button>
   <button class="drawer-item" onclick="switchPanel('recording')">
-    <img src="icons/麦克风.png" class="di-icon-img"> 录音记录
+    <img src="icons/麦克风.svg" class="di-icon-img"> 录音记录
   </button>
   <button class="drawer-item" onclick="switchPanel('report')">
-    <img src="icons/填写报告.png" class="di-icon-img"> 报告生成
+    <img src="icons/填写报告.svg" class="di-icon-img"> 报告生成
   </button>
   <button class="drawer-item" onclick="showCompletionOverview()">
-    <img src="icons/竣工.png" class="di-icon-img"> 竣工总览
+    <img src="icons/竣工.svg" class="di-icon-img"> 竣工总览
   </button>
   <button class="drawer-item" onclick="switchPanel('settings')">
-    <img src="icons/设置.png" class="di-icon-img"> 同步设置
+    <img src="icons/设置.svg" class="di-icon-img"> 同步设置
   </button>
   <div class="drawer-divider"></div>
   <button class="drawer-item" onclick="genDailyReport()">
-    <img src="icons/日报.png" class="di-icon-img"> 生成日报
+    <img src="icons/日报.svg" class="di-icon-img"> 生成日报
   </button>
   <button class="drawer-item" onclick="toggleDrawer()">
-    <img src="icons/关闭 icon.png" class="di-icon-img"> 关闭
+    <img src="icons/关闭.svg" class="di-icon-img"> 关闭
   </button>
 </div>
 
@@ -382,7 +382,7 @@
     </div>
     <div class="form-group"><label class="form-label">负责人</label><input class="form-input" id="reworkFormAssignee" placeholder="谁负责整改"></div>
     <input type="hidden" id="reworkFormId" value="">
-    <div class="form-group"><label class="form-label">问题照片</label><button class="btn btn-sm btn-secondary" onclick="takePhoto('rework')"><img src="icons/相机.png" class="icon-inline"> 拍照</button><div class="photo-grid mt-8" id="reworkFormPhotos"></div></div>
+    <div class="form-group"><label class="form-label">问题照片</label><button class="btn btn-sm btn-secondary" onclick="takePhoto('rework')"><img src="icons/相机.svg" class="icon-inline"> 拍照</button><div class="photo-grid mt-8" id="reworkFormPhotos"></div></div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('reworkModal')">取消</button>
       <button class="btn btn-primary" onclick="saveReworkForm()">保存</button>
@@ -439,7 +439,7 @@
   <div class="modal">
     <div class="modal-title">拍照分类</div>
     <p style="font-size:14px;color:var(--text-dim);margin-bottom:16px;">选择照片所属分类：</p>
-    <button class="btn btn-primary btn-block mb-8" onclick="takePhoto('daily');closeModal('photoCategoryModal')"><img src="icons/相机.png" class="icon-inline"> 施工进度</button>
+    <button class="btn btn-primary btn-block mb-8" onclick="takePhoto('daily');closeModal('photoCategoryModal')"><img src="icons/相机.svg" class="icon-inline"> 施工进度</button>
     <button class="btn btn-secondary btn-block mb-8" onclick="takePhoto('rework');closeModal('photoCategoryModal')">🔧 返工问题</button>
     <button class="btn btn-secondary btn-block mb-8" onclick="takePhoto('meeting');closeModal('photoCategoryModal')">📞 会议记录</button>
     <div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('photoCategoryModal')">取消</button></div>
