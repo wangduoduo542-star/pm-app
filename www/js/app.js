@@ -203,6 +203,12 @@ function showToast(msg) {
   toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
 }
 
+// 跳转到指定日期的跟进记录
+function jumpToDay(dateStr) {
+  currentDay = dateStr;
+  switchPanel('daily');
+}
+
 // ====== 导航 ======
 function switchPanel(name) {
   if (name === 'more') return;
@@ -397,7 +403,7 @@ function renderDailyOverview(project, allLogs, todayLog) {
     return log.date === dateStr || log.date.endsWith('_' + dateStr);
   }
 
-  // 最近7天热力条
+  // 最近7天热力条（保留）
   let heatHtml = '<div style="margin-bottom:10px;">';
   heatHtml += '<div style="display:flex;gap:4px;justify-content:space-between;margin-bottom:4px;">';
   for (let i = 6; i >= 0; i--) {
@@ -410,13 +416,33 @@ function renderDailyOverview(project, allLogs, todayLog) {
     const isFuture = dateStr > today;
     const dot = isFuture ? '○' : (log ? '●' : '○');
     const color = isFuture ? 'var(--text-dim)' : (log ? 'var(--green)' : 'var(--red)');
-    heatHtml += `<div style="text-align:center;flex:1;">
+    heatHtml += `<div style="text-align:center;flex:1;cursor:pointer;" onclick="jumpToDay('${dateStr}')">
       <div style="font-size:18px;color:${color};">${dot}</div>
       <div style="font-size:10px;color:var(--text-dim);">${dayStr}</div>
       <div style="font-size:9px;color:var(--text-dim);">周${weekStr}</div>
     </div>`;
   }
   heatHtml += '</div></div>';
+
+  // 日期滚动条（从项目开始到今天，支持滑动，今天居中）
+  let scrollHtml = '<div style="margin-bottom:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap;">';
+  scrollHtml += '<div style="display:inline-flex;gap:0;">';
+  const startIdx = Math.max(0, daysBetween(project.startDate, today) - 40);
+  const totalDays = project.totalDays || 70;
+  const rangeStart = Math.max(0, daysBetween(project.startDate, today) - 14);
+  const rangeEnd = Math.min(totalDays - 1, daysBetween(project.startDate, today) + 14);
+  for (let i = rangeStart; i <= rangeEnd; i++) {
+    const dateStr = addDays(project.startDate, i);
+    const log = allLogs.find(l => logDateMatch(l, dateStr));
+    const isToday = dateStr === today;
+    const hasLog = !!log;
+    scrollHtml += `<div onclick="jumpToDay('${dateStr}')" style="display:inline-block;width:44px;text-align:center;padding:6px 2px;cursor:pointer;border-radius:6px;${isToday ? 'background:var(--primary);color:#fff;font-weight:600;' : ''}">
+      <div style="font-size:10px;">${weekDays[new Date(dateStr).getDay()]}</div>
+      <div style="font-size:13px;">${String(new Date(dateStr).getDate()).padStart(2,'0')}</div>
+      <div style="font-size:9px;${isToday ? 'color:rgba(255,255,255,0.8);' : hasLog ? 'color:var(--green);' : 'color:var(--text-dim);'}">${hasLog ? '●' : '○'}</div>
+    </div>`;
+  }
+  scrollHtml += '</div></div>';
 
   // 昨天摘要
   const yesterday = new Date();
@@ -446,18 +472,32 @@ function renderDailyOverview(project, allLogs, todayLog) {
   const totalDone = allLogs.reduce((s, l) => s + (l.actualTasks || []).length, 0);
   const daysWithData = allLogs.length;
   const startDate = project.startDate;
-  const totalDays = project.totalDays || 70;
-  const elapsed = Math.min(daysBetween(startDate, today) + 1, totalDays);
+  const totalDaysNum = project.totalDays || 70;
+  const elapsed = Math.min(daysBetween(startDate, today) + 1, totalDaysNum);
   const trackedRate = elapsed > 0 ? Math.min(100, Math.round((daysWithData / elapsed) * 100)) : 0;
 
   el.innerHTML = `
-    ${heatHtml}
+    ${scrollHtml}
     ${summaryHtml}
     <div style="font-size:11px;color:var(--text-dim);margin-top:6px;padding-top:6px;border-top:1px solid var(--border);display:flex;justify-content:space-between;">
       <span>📝 计划${totalPlanned}项 · 完成${totalDone}项</span>
       <span>📊 跟进率${trackedRate}% (${daysWithData}/${elapsed}天)</span>
     </div>
   `;
+
+  // 滚动到今天（居中）
+  setTimeout(() => {
+    const scrollDiv = el.querySelector('div[style*="overflow-x"]');
+    if (scrollDiv) {
+      const items = scrollDiv.querySelectorAll('div[style*="inline-block"]');
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].textContent.includes(weekDays[new Date(today).getDay()]) && items[i].querySelector('div:nth-child(2)')?.textContent.trim() === String(new Date(today).getDate()).padStart(2,'0')) {
+          scrollDiv.scrollLeft = Math.max(0, i * 48 - 100);
+          break;
+        }
+      }
+    }
+  }, 100);
 }
 
 // ====== 进度曲线图 ======
