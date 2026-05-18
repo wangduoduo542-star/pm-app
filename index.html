@@ -299,22 +299,22 @@
   <!-- ===== 底部导航（仅项目内显示） ===== -->
   <nav class="bottom-nav" id="bottomNav">
     <button class="nav-item" data-panel="projects" onclick="switchPanel('projects')">
-      <span class="nav-icon">🏠</span><span style="font-size:10px;">列表</span>
+      <img src="icons/列表.png" class="nav-icon-img"><span style="font-size:10px;display:block;">列表</span>
     </button>
     <button class="nav-item active" data-panel="dashboard" onclick="switchPanel('dashboard')">
-      <span class="nav-icon">📊</span><span style="font-size:10px;">仪表</span>
+      <img src="icons/仪表盘_o.png" class="nav-icon-img"><span style="font-size:10px;display:block;">仪表</span>
     </button>
     <button class="nav-item" data-panel="daily" onclick="switchPanel('daily')">
-      <span class="nav-icon">📋</span><span style="font-size:10px;">跟进</span>
+      <img src="icons/跟进.png" class="nav-icon-img"><span style="font-size:10px;display:block;">跟进</span>
     </button>
     <button class="nav-item" data-panel="photos" onclick="switchPanel('photos')">
-      <span class="nav-icon">📸</span><span style="font-size:10px;">影像</span>
+      <img src="icons/相机.png" class="nav-icon-img"><span style="font-size:10px;display:block;">影像</span>
     </button>
     <button class="nav-item" data-panel="rework" onclick="switchPanel('rework')">
       <span class="nav-icon">🔧</span><span style="font-size:10px;">返工</span>
     </button>
     <button class="nav-item" data-panel="completion" onclick="switchPanel('completion')">
-      <span class="nav-icon">✅</span><span style="font-size:10px;">竣工</span>
+      <img src="icons/竣工.png" class="nav-icon-img"><span style="font-size:10px;display:block;">竣工</span>
     </button>
   </nav>
 </div>
@@ -322,28 +322,28 @@
 <!-- ===== 侧边抽屉 ===== -->
 <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
 <div class="drawer" id="drawer">
-  <div class="drawer-header">📂 导航菜单</div>
+  <div class="drawer-header">📂 菜单</div>
   <button class="drawer-item" onclick="switchPanel('planning')">
-    <span class="di-icon">📐</span> 计划 & 甘特图
+    <img src="icons/计划.png" class="di-icon-img"> 施工计划
   </button>
   <button class="drawer-item" onclick="switchPanel('recording')">
-    <span class="di-icon">🎙️</span> 录音记录
+    <img src="icons/麦克风.png" class="di-icon-img"> 录音记录
   </button>
   <button class="drawer-item" onclick="switchPanel('report')">
-    <span class="di-icon">📋</span> 报告生成
+    <img src="icons/填写报告.png" class="di-icon-img"> 报告生成
   </button>
   <button class="drawer-item" onclick="showCompletionOverview()">
-    <span class="di-icon">✅</span> 竣工总览
+    <img src="icons/竣工.png" class="di-icon-img"> 竣工总览
   </button>
   <button class="drawer-item" onclick="switchPanel('settings')">
-    <span class="di-icon">⚙️</span> 设置
+    <img src="icons/设置.png" class="di-icon-img"> 同步设置
   </button>
   <div class="drawer-divider"></div>
   <button class="drawer-item" onclick="genDailyReport()">
-    <span class="di-icon">📝</span> 快速生成日报
+    <img src="icons/日报.png" class="di-icon-img"> 生成日报
   </button>
   <button class="drawer-item" onclick="toggleDrawer()">
-    <span class="di-icon">✕</span> 关闭
+    <img src="icons/关闭 icon.png" class="di-icon-img"> 关闭
   </button>
 </div>
 
