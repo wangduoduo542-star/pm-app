@@ -323,23 +323,23 @@
 <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-header">📂 导航菜单</div>
-  <button class="drawer-item" onclick="switchPanel('planning')">
+  <button class="drawer-item" onclick="switchPanel('planning');toggleDrawer()">
     <span class="di-icon">📐</span> 计划 & 甘特图
   </button>
-  <button class="drawer-item" onclick="switchPanel('recording')">
+  <button class="drawer-item" onclick="switchPanel('recording');toggleDrawer()">
     <span class="di-icon">🎙️</span> 录音记录
   </button>
-  <button class="drawer-item" onclick="switchPanel('report')">
+  <button class="drawer-item" onclick="switchPanel('report');toggleDrawer()">
     <span class="di-icon">📋</span> 报告生成
   </button>
-  <button class="drawer-item" onclick="showCompletionOverview()">
+  <button class="drawer-item" onclick="showCompletionOverview();toggleDrawer()">
     <span class="di-icon">✅</span> 竣工总览
   </button>
-  <button class="drawer-item" onclick="switchPanel('settings')">
+  <button class="drawer-item" onclick="switchPanel('settings');toggleDrawer()">
     <span class="di-icon">⚙️</span> 设置
   </button>
   <div class="drawer-divider"></div>
-  <button class="drawer-item" onclick="genDailyReport()">
+  <button class="drawer-item" onclick="genDailyReport();toggleDrawer()">
     <span class="di-icon">📝</span> 快速生成日报
   </button>
   <button class="drawer-item" onclick="toggleDrawer()">
@@ -456,5 +456,29 @@
 
 <script src="js/data.js?v=14"></script>
 <script src="js/app.js?v=14"></script>
-</body>
+<div style='position:fixed;bottom:0;left:0;right:0;background:#ff0;padding:8px;z-index:999;font-size:14px;'>
+    <b>调试信息</b>
+    <div id='debugInfo'>加载中...</div>
+  </div>
+  <script>
+    setTimeout(async()=>{
+      try{
+        const all=await (async()=>{
+          const db=await new Promise((r,rej)=>{
+            const req=indexedDB.open('pm_app',1);
+            req.onsuccess=()=>r(req.result);
+            req.onerror=()=>rej(req.error);
+          });
+          const tx=db.transaction('project','readonly');
+          return new Promise(r=>{
+            const req=tx.objectStore('project').getAll();
+            req.onsuccess=()=>r(req.result);
+          });
+        })();
+        document.getElementById('debugInfo').textContent='项目数: '+all.length+' | '+JSON.stringify(all.map(p=>({id:p.id,name:p.name})));
+      }catch(e){
+        document.getElementById('debugInfo').textContent='错误: '+e.message;
+      }
+    },1000);
+  </script></body>
 </html>

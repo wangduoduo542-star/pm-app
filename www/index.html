@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>项目管理</title>
 <link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="css/app.css?v=13">
+<link rel="stylesheet" href="css/app.css?v=14">
 </head>
 <body>
 
@@ -323,23 +323,23 @@
 <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-header">📂 导航菜单</div>
-  <button class="drawer-item" onclick="switchPanel('planning');toggleDrawer()">
+  <button class="drawer-item" onclick="switchPanel('planning')">
     <span class="di-icon">📐</span> 计划 & 甘特图
   </button>
-  <button class="drawer-item" onclick="switchPanel('recording');toggleDrawer()">
+  <button class="drawer-item" onclick="switchPanel('recording')">
     <span class="di-icon">🎙️</span> 录音记录
   </button>
-  <button class="drawer-item" onclick="switchPanel('report');toggleDrawer()">
+  <button class="drawer-item" onclick="switchPanel('report')">
     <span class="di-icon">📋</span> 报告生成
   </button>
-  <button class="drawer-item" onclick="showCompletionOverview();toggleDrawer()">
+  <button class="drawer-item" onclick="showCompletionOverview()">
     <span class="di-icon">✅</span> 竣工总览
   </button>
-  <button class="drawer-item" onclick="switchPanel('settings');toggleDrawer()">
+  <button class="drawer-item" onclick="switchPanel('settings')">
     <span class="di-icon">⚙️</span> 设置
   </button>
   <div class="drawer-divider"></div>
-  <button class="drawer-item" onclick="genDailyReport();toggleDrawer()">
+  <button class="drawer-item" onclick="genDailyReport()">
     <span class="di-icon">📝</span> 快速生成日报
   </button>
   <button class="drawer-item" onclick="toggleDrawer()">
@@ -454,7 +454,7 @@
 <!-- ===== 隐藏的文件输入（用于拍照/选图） ===== -->
 <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhotoCapture(event)">
 
-<script src="js/data.js?v=13"></script>
-<script src="js/app.js?v=13"></script>
+<script src="js/data.js?v=14"></script>
+<script src="js/app.js?v=14"></script>
 </body>
 </html>

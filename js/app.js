@@ -115,6 +115,7 @@ async function confirmNewProject() {
 
   const p = await createProject(name, startDate, days);
   setCurrentProjectId(p.id);
+  _inProject = true;
   closeModal('newProjectModal');
   refreshProjectList();
   document.getElementById('headerTitle').textContent = p.name;
@@ -124,6 +125,7 @@ async function confirmNewProject() {
 }
 
 async function switchProject(id) {
+  _inProject = true;
   setCurrentProjectId(id);
   const p = await getProject(id);
   if (p) document.getElementById('headerTitle').textContent = p.name;
@@ -133,6 +135,7 @@ async function switchProject(id) {
 }
 
 async function openProject(id) {
+  _inProject = true;
   // 点击卡片直接进入
   if (id === getCurrentProjectId()) {
     switchPanel('dashboard');
@@ -195,6 +198,9 @@ function showToast(msg) {
   toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
 }
 
+// 底部导航显隐控制
+let _inProject = false; // 是否已进入某个项目
+
 // ====== 导航 ======
 function switchPanel(name) {
   if (name === 'more') return;
@@ -210,12 +216,17 @@ function switchPanel(name) {
 
   currentPanel = name;
 
-  // 更新底部导航可见性（项目列表页隐藏，进项目后显示）
+  // 底部导航：仅进项目后显示，抽屉/项目列表页隐藏
   const appEl = document.getElementById('app');
-  if (name === 'projects') {
-    appEl.classList.add('no-project');
-  } else {
+  if (_inProject && name !== 'projects') {
     appEl.classList.remove('no-project');
+  } else {
+    appEl.classList.add('no-project');
+  }
+
+  // 回到项目列表时重置进项目状态
+  if (name === 'projects') {
+    _inProject = false;
   }
 
   // 更新顶部标题

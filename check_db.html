@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html><body>
+<h3>IndexedDB 检查</h3>
+<div id="out">加载中...</div>
+<script>
+(async()=>{
+  try {
+    const db = await new Promise(r=>{const req=indexedDB.open('pm_app',1); req.onsuccess=()=>r(req.result);});
+    const tx = db.transaction('project','readonly');
+    const all = await new Promise(r=>{const req=tx.objectStore('project').getAll(); req.onsuccess=()=>r(req.result);});
+    document.getElementById('out').innerHTML = '项目数: ' + all.length + '<br><br>' +
+      all.map(p => 'ID: ' + p.id + '<br>名称: ' + p.name + '<br><hr>').join('');
+  } catch(e) {
+    document.getElementById('out').innerHTML = '错误: ' + e.message;
+  }
+})();
+</script>
+</body></html>

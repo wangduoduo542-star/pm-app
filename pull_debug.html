@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html><body>
+<h3>拉取测试</h3>
+<div id='status'>准备...</div>
+<script>
+(async()=>{
+  const status=document.getElementById('status');
+  
+  // 1) 查看拉取前 IndexedDB
+  const readDB=async()=>{
+    const db=await new Promise((r,rej)=>{
+      const req=indexedDB.open('pm_app',1);
+      req.onsuccess=()=>r(req.result);
+      req.onerror=()=>rej(req.error);
+    });
+    const tx=db.transaction('project','readonly');
+    return new Promise(r=>{
+      const req=tx.objectStore('project').getAll();
+      req.onsuccess=()=>r(req.result);
+    });
+  };
+  
+  const before=await readDB();
+  status.innerHTML+='<br>拉取前项目数: '+before.length+' <br>';
+  
+  // 2) 执行拉取
+  try{
+    const listResp=await fetch('http://localhost:3456/api/sync/pull');
+    const listData=await listResp.json();
+    status.innerHTML+='类型列表: '+JSON.stringify(listData.types)+'<br>';
+    
+    for(const type of listData.types){
+      if(type==='test')continue;
+      const resp=await fetch('http://localhost:3456/api/sync/pull?type='+type);
+      const d=await resp.json();
+      status.innerHTML+='拉取 '+type+': '+(d.data?'有数据':'无数据')+'<br>';
+      
+      if(d.data){
+        // 写入 IndexedDB (模拟 app 的 pull 逻辑)
+        const db=await new Promise((r,rej)=>{
+          const req=indexedDB.open('pm_app',1);
+          req.onsuccess=()=>r(req.result);
+          req.onerror=()=>rej(req.error);
+        });
+        const tx=db.transaction('project','readwrite');
+        await new Promise((r,rej)=>{
+          const req=tx.objectStore('project').put(d.data);
+          req.onsuccess=()=>r(req.result);
+          req.onerror=()=>rej(req.error);
+        });
+        status.innerHTML+='  写入完成! key='+d.data.id+'<br>';
+      }
+    }
+  }catch(e){
+    status.innerHTML+='错误: '+e.message+'<br>';
+  }
+  
+  // 3) 拉取后检查
+  const after=await readDB();
+  status.innerHTML+='拉取后项目数: '+after.length+' <br>';
+  after.forEach(p=>{
+    status.innerHTML+='  - id:'+p.id+' name:'+p.name+'<br>';
+  });
+})();
+</script>
+</body></html>
