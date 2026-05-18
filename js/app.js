@@ -1294,14 +1294,13 @@ function renderGantt(project, phases, milestones, dayLogs) {
   // 右侧滚动区域（日期+条）
   html += '<div style="overflow-x:auto;flex:1;-webkit-overflow-scrolling:touch;">';
 
-  // 日期头
+  // 日期头（全部按日期显示 M/D）
   html += '<div class="gantt-days" style="height:38px;">';
   for (let i = startIdx; i <= endIdx; i++) {
     const date = addDays(startDate, i);
     const isToday = date === today;
-    const dayNum = i + 1;
-    const md = (i % 7 === 0) ? formatDate(date) : dayNum;
-    html += `<div class="gantt-day ${isToday ? 'today' : ''}" style="min-width:30px;">${md}</div>`;
+    const md = formatDate(date);
+    html += `<div class="gantt-day ${isToday ? 'today' : ''}">${md}</div>`;
   }
   html += '</div>';
 
@@ -1317,13 +1316,13 @@ function renderGantt(project, phases, milestones, dayLogs) {
     for (let i = startIdx; i <= endIdx; i++) {
       const date = addDays(startDate, i);
       const isToday = date === today;
-      html += `<div style="min-width:30px;height:100%;border-right:1px solid var(--border);${isToday ? 'background:rgba(233,69,96,0.08);' : ''}"></div>`;
+      html += `<div class="gantt-cell" style="height:100%;border-right:1px solid var(--border);${isToday ? 'background:rgba(233,69,96,0.08);' : ''}"></div>`;
     }
     // 阶段条
     if (pStart <= pEnd) {
       const percent = (pStart - startIdx) / (endIdx - startIdx + 1) * 100;
       const width = (pEnd - pStart + 1) / (endIdx - startIdx + 1) * 100;
-      html += `<div class="gantt-bar" style="left:${percent}%;width:${width}%;background:${p.color};top:8px;">${p.name}</div>`;
+      html += `<div class="gantt-bar" style="left:${percent}%;width:${width}%;background:${p.color};top:8px;"></div>`;
 
       // 实际进度条（如果有日志）
       let actualDays = 0;
