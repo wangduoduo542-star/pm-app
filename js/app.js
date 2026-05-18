@@ -173,6 +173,7 @@ function updateHeaderDate() {
 }
 
 function refreshAll() {
+  refreshProjectList();
   refreshDashboard();
   refreshDaily();
   refreshPhotos();
@@ -1925,7 +1926,9 @@ async function importData(event) {
 let syncServerBase = '';
 
 function getSyncServerUrl() {
-  const ip = document.getElementById('syncServerIP').value.trim();
+  let ip = document.getElementById('syncServerIP').value.trim();
+  // 处理全角冒号（中文输入法）
+  ip = ip.replace(/[：:]/g, ':').replace(/[，,]/g, '.');
   if (!ip) { showToast('⚠️ 请先输入服务器地址'); return null; }
   const base = ip.startsWith('http') ? ip : 'http://' + ip;
   syncServerBase = base.replace(/\/+$/, '');
