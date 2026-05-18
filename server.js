@@ -1,5 +1,5 @@
 /**
- * 装修项目管家 - 局域网同步服务器
+ * 项目管理 - 局域网同步服务器
  * 在 Windows 电脑上运行，手机端通过局域网连接同步数据
  *
  * 启动: node server.js
@@ -167,7 +167,7 @@ server.listen(PORT, '0.0.0.0', () => {
   const ip = getLocalIP();
   console.log('');
   console.log('═══════════════════════════════════════');
-  console.log('  装修项目管家 - 局域网同步服务器');
+  console.log('  项目管理 - 局域网同步服务器');
   console.log('═══════════════════════════════════════');
   console.log('');
   console.log(`  本机地址:    http://localhost:${PORT}`);

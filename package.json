@@ -1,7 +1,7 @@
 {
   "name": "pm-app",
   "version": "1.0.0",
-  "description": "装修项目管家 - 施工管理 + 局域网同步",
+  "description": "项目管理 - 施工管理 + 局域网同步",
   "main": "electron/main.js",
   "scripts": {
     "start": "electron .",
@@ -11,7 +11,7 @@
   },
   "build": {
     "appId": "com.pm.app",
-    "productName": "装修项目管家",
+    "productName": "项目管理",
     "directories": { "output": "dist" },
     "files": [
       "electron/**/*", "index.html", "css/**/*", "js/**/*",

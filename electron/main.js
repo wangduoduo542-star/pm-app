@@ -1,5 +1,5 @@
 /**
- * 装修项目管家 - Electron 桌面端
+ * 项目管理 - Electron 桌面端
  * 包装 Web 应用 + 内置局域网同步服务器
  */
 
@@ -32,7 +32,7 @@ function createWindow() {
     minWidth: 360,
     minHeight: 600,
     icon: path.join(__dirname, '..', 'icons', 'icon-512.png'),
-    title: '装修项目管家',
+    title: '项目管理',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -58,7 +58,7 @@ function createTray() {
   const icon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 });
 
   tray = new Tray(icon);
-  tray.setToolTip('装修项目管家');
+  tray.setToolTip('项目管理');
 
   const contextMenu = Menu.buildFromTemplate([
     { label: '打开窗口', click: () => mainWindow && mainWindow.show() },

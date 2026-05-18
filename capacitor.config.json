@@ -1,6 +1,6 @@
 {
   "appId": "com.pm.app",
-  "appName": "装修项目管家",
+  "appName": "项目管理",
   "webDir": "www",
   "bundledWebRuntime": false,
   "server": {

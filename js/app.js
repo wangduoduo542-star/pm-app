@@ -1,5 +1,5 @@
 /**
- * 装修项目管家 - 主应用逻辑
+ * 项目管理 - 主应用逻辑
  */
 
 // ====== 全局状态 ======
@@ -1372,7 +1372,7 @@ function savePlanSettings() {
     p.totalDays = parseInt(document.getElementById('planTotalDays').value) || 70;
     return saveProject(p);
   }).then(() => {
-    document.getElementById('headerTitle').textContent = document.getElementById('planName').value || '装修项目管家';
+    document.getElementById('headerTitle').textContent = document.getElementById('planName').value || '项目管理';
     refreshAll();
     showToast('✅ 设置已保存');
   });
@@ -2122,4 +2122,4 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
 
-console.log('🏗️ 装修项目管家 v1.0 已加载 (版本: 2026-05-15-v2)');
+console.log('🏗️ 项目管理 v1.0 已加载 (版本: 2026-05-15-v2)');
