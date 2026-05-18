@@ -10,3 +10,6 @@ electron/node_modules/
 .DS_Store
 Thumbs.db
 sync_data/
+check_db.html
+debug_test.html
+pull_debug.html
