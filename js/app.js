@@ -1381,11 +1381,11 @@ function renderGantt(project, phases, milestones, dayLogs) {
 
   container.innerHTML = html;
 
-  // 滚动到今天
+  // 滚动到今天（位于左侧第一个可见列）
   setTimeout(() => {
     const scrollContainer = container.querySelector('div[style*="overflow"]');
     if (scrollContainer) {
-      const todayOffset = (todayIdx - startIdx) * 30 - 60;
+      const todayOffset = (todayIdx - startIdx) * 30;
       scrollContainer.scrollLeft = Math.max(0, todayOffset);
     }
   }, 100);
