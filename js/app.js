@@ -354,7 +354,7 @@ async function refreshDashboard(reworks) {
       </span>
       <span class="text-dim" style="font-size:11px;">${sDate}~${eDate} <span class="${pProgress >= 100 ? 'text-green' : 'text-dim'}">${Math.min(100,pProgress)}%</span></span>
     </div>`;
-  }).join('') : '<div class="empty-state"><p>暂无施工阶段，请前往"计划"设置</p></div>';
+  }).join('') : '<div class="empty-state clickable-phase" style="cursor:pointer;"><p>暂无施工阶段，点击创建</p></div>';
   document.getElementById('dashPhases').innerHTML = phaseHtml;
 
   // 跟进概览
