@@ -1283,11 +1283,16 @@ function renderGantt(project, phases, milestones, dayLogs) {
 
   let html = '<div style="display:flex;min-width:100%;">';
 
-  // 左侧固定列（阶段名）
+  // 左侧固定列（阶段名 + 日期范围调试）
   html += '<div style="flex-shrink:0;">';
   html += '<div class="gantt-label-col" style="height:38px;display:flex;align-items:center;">阶段</div>';
   for (const p of phases) {
-    html += `<div class="gantt-row-label" style="height:36px;">${p.name}</div>`;
+    const startDateStr = addDays(startDate, p.startDay - 1);
+    const endDateStr = addDays(startDate, p.endDay - 1);
+    html += `<div class="gantt-row-label" style="height:36px;font-size:11px;flex-direction:column;align-items:flex-start;">
+      <span>${p.name}</span>
+      <span style="font-size:10px;color:var(--text-dim);">📅 ${formatDateShort(startDateStr)}~${formatDateShort(endDateStr)} (${p.startDay}-${p.endDay})</span>
+    </div>`;
   }
   html += '</div>';
 
