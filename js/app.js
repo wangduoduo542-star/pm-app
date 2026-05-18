@@ -1932,12 +1932,56 @@ function getSyncServerUrl() {
   return syncServerBase;
 }
 
-async function discoverServer() {
-  // 尝试常见局域网IP段（根据当前页面URL推断）
-  showToast('🔍 正在搜索同步服务器...');
-  document.getElementById('syncStatus').textContent = '搜索中...';
+// 通过 WebRTC 获取本机局域网 IP
+async function getDeviceIP() {
+  return new Promise((resolve) => {
+    try {
+      const pc = new RTCPeerConnection({ iceServers: [] });
+      let resolved = false;
+      pc.createDataChannel('');
+      pc.createOffer().then(offer => pc.setLocalDescription(offer)).catch(() => {});
+      pc.onicecandidate = (e) => {
+        if (!e.candidate) {
+          if (!resolved) { resolved = true; resolve(null); }
+          return;
+        }
+        const m = e.candidate.candidate.match(/(\d+\.\d+\.\d+\.\d+)/);
+        if (m) {
+          const ip = m[1];
+          if (/^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(ip) && !ip.startsWith('127.')) {
+            resolved = true;
+            pc.close();
+            resolve(ip);
+          }
+        }
+      };
+      setTimeout(() => { if (!resolved) { resolved = true; pc.close(); resolve(null); } }, 2000);
+    } catch(e) {
+      resolve(null);
+    }
+  });
+}
 
-  // 优先尝试用户输入的地址
+// 快速探测单个IP (用 Promise.race 兼容旧 WebView)
+function probeIP(ip) {
+  const url = 'http://' + ip + ':3456/api/status';
+  const fetchPromise = fetch(url).then(resp => resp.ok ? resp.json() : Promise.reject()).then(data => ({ ip: data.ip, port: data.port, files: data.files }));
+  const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 800));
+  return Promise.race([fetchPromise, timeoutPromise]).catch(() => null);
+}
+
+// 并行探测一批IP，返回第一个成功的
+async function probeBatch(ips) {
+  const results = await Promise.all(ips.map(ip => probeIP(ip)));
+  return results.find(r => r !== null) || null;
+}
+
+async function discoverServer() {
+  showToast('🔍 正在扫描局域网...');
+  const statusEl = document.getElementById('syncStatus');
+  statusEl.textContent = '搜索中...';
+
+  // 1) 先尝试用户输入的地址
   let input = document.getElementById('syncServerIP').value.trim();
   if (input) {
     const base = input.startsWith('http') ? input : 'http://' + input;
@@ -1945,7 +1989,7 @@ async function discoverServer() {
       const resp = await fetch(base.replace(/\/+$/, '') + '/api/status', { signal: AbortSignal.timeout(3000) });
       if (resp.ok) {
         const data = await resp.json();
-        document.getElementById('syncStatus').textContent = `✅ 已连接服务器 (${data.ip}:${data.port}) 文件: ${data.files.length} 个`;
+        statusEl.textContent = `✅ 已连接服务器 (${data.ip}:${data.port}) 文件: ${data.files.length} 个`;
         document.getElementById('syncServerIP').value = data.ip + ':' + data.port;
         showToast('✅ 服务器连接成功');
         return;
@@ -1953,23 +1997,74 @@ async function discoverServer() {
     } catch(e) {}
   }
 
-  // 自动搜索：从当前页面URL推断
+  // 2) URL 推断 (PC浏览器访问时有效)
   const currentUrl = window.location.hostname;
-  if (currentUrl && currentUrl !== 'localhost' && currentUrl !== '127.0.0.1' && currentUrl !== '') {
-    try {
-      const base = 'http://' + currentUrl + ':3456';
-      const resp = await fetch(base + '/api/status', { signal: AbortSignal.timeout(2000) });
-      if (resp.ok) {
-        const data = await resp.json();
-        document.getElementById('syncServerIP').value = currentUrl + ':3456';
-        document.getElementById('syncStatus').textContent = `✅ 已连接服务器 (${currentUrl})`;
+  if (currentUrl && currentUrl !== 'localhost' && currentUrl !== '127.0.0.1') {
+    const result = await probeIP(currentUrl);
+    if (result) {
+      document.getElementById('syncServerIP').value = result.ip + ':' + result.port;
+      statusEl.textContent = `✅ 已连接服务器 (${result.ip}:${result.port}) 文件: ${result.files.length} 个`;
+      showToast('✅ 服务器连接成功');
+      return;
+    }
+  }
+
+  // 3) 获取本机IP，扫描同网段
+  statusEl.textContent = '获取本机网络...';
+  const myIP = await getDeviceIP();
+
+  if (myIP) {
+    const parts = myIP.split('.');
+    const prefix = parts[0] + '.' + parts[1] + '.' + parts[2];
+    statusEl.textContent = `扫描 ${prefix}.xxx ...`;
+
+    // 优先扫网关（.1）和常用低段 (.2-.30)
+    const priority = [1, 2, 3, 100, 101, 102, 103];
+    // 然后扫其余 (.31-.254)，排除自己
+    const rest = [];
+    for (let i = 4; i <= 254; i++) {
+      if (i === parseInt(parts[3])) continue;
+      if (!priority.includes(i)) rest.push(i);
+    }
+    const allTargets = [...priority, ...rest];
+
+    // 分批并行扫描，每批 20 个
+    for (let b = 0; b < allTargets.length; b += 20) {
+      const batch = allTargets.slice(b, b + 20).map(n => prefix + '.' + n);
+      statusEl.textContent = `扫描中... (${b + 1}-${Math.min(b + 20, allTargets.length)} / ${allTargets.length})`;
+      const hit = await probeBatch(batch);
+      if (hit) {
+        document.getElementById('syncServerIP').value = hit.ip + ':' + hit.port;
+        statusEl.textContent = `✅ 已连接服务器 (${hit.ip}:${hit.port}) 文件: ${hit.files.length} 个`;
         showToast('✅ 服务器连接成功');
         return;
       }
-    } catch(e) {}
+    }
   }
 
-  document.getElementById('syncStatus').textContent = '❌ 未找到服务器，请确认电脑已运行 server.js';
+  // 4) 尝试几个常见网段作为 fallback（每网段扫 .1-.50 的前30个）
+  statusEl.textContent = '扩展搜索常见网段...';
+  const commonPrefixes = ['192.168.1', '192.168.0', '192.168.31', '10.0.0', '172.16.0'];
+  for (const prefix of commonPrefixes) {
+    const ips = [];
+    // 优先扫低段+常见段，总共扫50个
+    for (let i = 1; i <= 50; i++) ips.push(prefix + '.' + i);
+    // 再加几个常见的
+    ips.push(prefix + '.100', prefix + '.101', prefix + '.102');
+    for (let b = 0; b < ips.length; b += 20) {
+      const batch = ips.slice(b, b + 20);
+      statusEl.textContent = `扫描 ${prefix}.x (${b + 1}-${Math.min(b + 20, ips.length)})`;
+      const hit = await probeBatch(batch);
+      if (hit) {
+        document.getElementById('syncServerIP').value = hit.ip + ':' + hit.port;
+        statusEl.textContent = `✅ 已连接服务器 (${hit.ip}:${hit.port}) 文件: ${hit.files.length} 个`;
+        showToast('✅ 服务器连接成功');
+        return;
+      }
+    }
+  }
+
+  statusEl.textContent = '❌ 未找到服务器，请确认电脑已连接同一WiFi并运行 server.js';
   showToast('❌ 未找到服务器');
 }
 
