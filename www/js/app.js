@@ -1291,7 +1291,7 @@ function renderGantt(project, phases, milestones, dayLogs) {
     const endDateStr = addDays(startDate, p.endDay - 1);
     html += `<div class="gantt-row-label" style="height:36px;font-size:11px;flex-direction:column;align-items:flex-start;">
       <span>${p.name}</span>
-      <span style="font-size:10px;color:var(--text-dim);">📅 ${formatDateShort(startDateStr)}~${formatDateShort(endDateStr)} (${p.startDay}-${p.endDay})</span>
+      <span style="font-size:10px;color:var(--text-dim);">📅 ${formatDateShort(startDateStr)}~${formatDateShort(endDateStr)}</span>
     </div>`;
   }
   html += '</div>';
@@ -1407,7 +1407,7 @@ function showPhaseForm() {
   getProject().then(p => {
     document.getElementById('phaseFormId').value = '';
     document.getElementById('phaseFormName').value = '';
-    document.getElementById('phaseFormStart').value = p && p.startDate ? p.startDate : '';
+    document.getElementById('phaseFormStart').value = getToday();
     document.getElementById('phaseFormDays').value = '';
     document.getElementById('phaseFormColor').value = '#e94560';
     document.getElementById('phaseDeleteBtn').style.display = 'none';

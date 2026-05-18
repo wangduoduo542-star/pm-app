@@ -270,7 +270,7 @@ body {
   display: flex; border-bottom: 1px solid var(--border); min-height: 36px;
 }
 .gantt-row-label {
-  min-width: 160px; padding: 4px 10px; font-size: 12px;
+  min-width: 200px; padding: 4px 10px; font-size: 12px;
   border-right: 1px solid var(--border); flex-shrink: 0;
   display: flex; align-items: center; gap: 4px;
 }
