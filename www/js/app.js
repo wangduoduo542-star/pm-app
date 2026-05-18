@@ -195,6 +195,9 @@ function showToast(msg) {
   toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
 }
 
+// 仪表盘施工阶段→跳转计划页面
+function goToPlanning() { switchPanel('planning'); }
+
 // ====== 导航 ======
 function switchPanel(name) {
   if (name === 'more') return;
@@ -341,7 +344,7 @@ async function refreshDashboard(reworks) {
     const pProgress = pTotal > 0 ? Math.round((Math.max(0, clampedDays - pStart + 1) / pTotal) * 100) : 0;
     const sDate = formatDateShort(addDays(project.startDate, p.startDay - 1));
     const eDate = formatDateShort(addDays(project.startDate, p.endDay - 1));
-    return `<div class="flex-between mb-8" style="font-size:13px;">
+    return `<div class="flex-between mb-8" style="font-size:13px;cursor:pointer;" onclick="goToPlanning()">
       <span style="display:flex;align-items:center;gap:6px;">
         <span style="width:10px;height:10px;border-radius:3px;background:${p.color};display:inline-block;"></span>
         ${p.name}
