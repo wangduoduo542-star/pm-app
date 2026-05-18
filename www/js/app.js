@@ -1986,7 +1986,7 @@ async function discoverServer() {
   if (input) {
     const base = input.startsWith('http') ? input : 'http://' + input;
     try {
-      const resp = await fetch(base.replace(/\/+$/, '') + '/api/status', { signal: AbortSignal.timeout(3000) });
+      const resp = await fetchTimeout(base.replace(/\/+$/, '') + '/api/status', {}, 3000);
       if (resp.ok) {
         const data = await resp.json();
         statusEl.textContent = `✅ 已连接服务器 (${data.ip}:${data.port}) 文件: ${data.files.length} 个`;
@@ -2073,24 +2073,29 @@ function setSyncStatus(msg) {
   if (el) el.textContent = msg;
 }
 
+// fetch 带超时 (兼容不支持 AbortSignal.timeout 的旧 WebView)
+function fetchTimeout(url, opts, ms) {
+  const fetchPromise = fetch(url, opts);
+  const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('请求超时')), ms));
+  return Promise.race([fetchPromise, timeoutPromise]);
+}
+
 async function syncPush() {
   if (!getSyncServerUrl()) return;
   setSyncStatus('⏳ 正在推送数据...');
 
   try {
     const allData = await exportAllData();
-    const pushData = {};
 
     // 分类型推送
     const types = ['project', 'phases', 'dayLogs', 'photos', 'recordings', 'rework', 'milestones', 'materials', 'attendance'];
     for (const type of types) {
       if (allData[type] && (Array.isArray(allData[type]) ? allData[type].length > 0 : allData[type])) {
-        const resp = await fetch(syncServerBase + '/api/sync/push', {
+        const resp = await fetchTimeout(syncServerBase + '/api/sync/push', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type, payload: allData[type] }),
-          signal: AbortSignal.timeout(30000)
-        });
+          body: JSON.stringify({ type, payload: allData[type] })
+        }, 30000);
         if (!resp.ok) throw new Error(type + ' 推送失败');
       }
     }
@@ -2109,7 +2114,7 @@ async function syncPull() {
 
   try {
     // 获取所有可用数据类型
-    const listResp = await fetch(syncServerBase + '/api/sync/pull', { signal: AbortSignal.timeout(5000) });
+    const listResp = await fetchTimeout(syncServerBase + '/api/sync/pull', {}, 5000);
     const listData = await listResp.json();
     if (!listData.types || listData.types.length === 0) {
       setSyncStatus('⚠️ 服务器上没有数据');
@@ -2118,7 +2123,7 @@ async function syncPull() {
 
     // 逐个拉取
     for (const type of listData.types) {
-      const resp = await fetch(syncServerBase + '/api/sync/pull?type=' + type, { signal: AbortSignal.timeout(30000) });
+      const resp = await fetchTimeout(syncServerBase + '/api/sync/pull?type=' + type, {}, 30000);
       if (resp.ok) {
         const data = await resp.json();
         if (data.data) {
@@ -2164,12 +2169,11 @@ async function syncFull() {
       }
     }
 
-    const resp = await fetch(syncServerBase + '/api/sync/full', {
+    const resp = await fetchTimeout(syncServerBase + '/api/sync/full', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ push: pushPayload }),
-      signal: AbortSignal.timeout(60000)
-    });
+      body: JSON.stringify({ push: pushPayload })
+    }, 60000);
 
     if (!resp.ok) throw new Error('同步请求失败');
     const result = await resp.json();
