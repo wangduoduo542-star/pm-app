@@ -1232,6 +1232,10 @@ async function unresolveReworkItem(id) {
 async function refreshPlanning() {
   const project = await getProject();
   if (!project) { switchPanel('projects'); return; }
+  // 同步项目设置信息
+  document.getElementById('planName').value = project.name || '';
+  document.getElementById('planStartDate').value = project.startDate || '';
+  document.getElementById('planTotalDays').value = project.totalDays || '';
   const phases = await getPhases();
   const milestones = await getMilestones();
   const allLogs = await getAllDayLogs();
