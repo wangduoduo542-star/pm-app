@@ -9,3 +9,4 @@ electron/node_modules/
 .claude/
 .DS_Store
 Thumbs.db
+sync_data/
