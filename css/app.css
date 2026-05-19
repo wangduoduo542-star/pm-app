@@ -151,7 +151,7 @@ body {
 .drawer-item:active { background: var(--bg-card2); }
 .drawer-item .di-icon { font-size: 20px; width: 28px; text-align: center; }
 .di-icon-img, .nav-icon-img, .icon-inline {
-  width: 20px; height: 20px; vertical-align: middle;
+  width: 20px; height: 20px; vertical-align: middle; filter: brightness(0);
 }
 .di-icon-img { margin-right: 4px; }
 .icon-inline { margin: 0 2px; }
